@@ -283,7 +283,7 @@ client.on('message', message => {
 **
 
 -${message.guild.name}  Link
-**`)
+*https://discord.gg/qcxvXf*`)
       message.author.sendEmbed(Embed11)
     }
 });
