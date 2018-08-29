@@ -487,7 +487,7 @@ client.on('message', message => {
 **
 :small_orange_diamond:   البوت يكتب الي ��نت تكتبه في صورة
 b-say
-l_orange_diamond:   لمسح الشات
+:l_orange_diamond:   لمسح الشات
 b-clear
 :small_orange_diamond:   للباند
 b-ban
@@ -499,7 +499,10 @@ b-bc
 b-unbanall
 :small_blue_diamond: ل روية جميع المبندين في سرفرك 
 b-bans
-
+:small_blue_diamond:ل اعطاء العضو ميوت 
+b-mute
+:small_blue_diamond:ل فك الميوت عن العضو 
+b-unmute 
 ----
 **
 ***
@@ -532,10 +535,10 @@ b-vc
 
  ----
 رابط السبورت البوت
- https://discord.gg/T26nWg
+ https://discord.gg/qcxvXf
 ----------
 رابط دعوة البوت
-https://discordapp.com/api/oauth2/authorize?client_id=476788319833817088&permissions=8&scope=bot
+https://discordapp.com/api/oauth2/authorize?client_id=477272802123317259&permissions=8&scope=bot
 
 **
 
@@ -1491,7 +1494,57 @@ m.sendMessage(args)
  
  
  
+lient.on("message", (message) => {
+    var command = message.content.split(" ")[0];
+    command = command.slice(prefix.length);
+    if (!message.content.startsWith(prefix)) return;
+    switch(command) {
+        case "b-mute" : 
+        if (!message.channel.type =="text") return;
+        if (!message.member.hasPermission("MANAGE_CHANNELS")) return;
+        if (!message.mentions.members.first()) return;
+        message.guild.channels.forEach(c => {
+            c.overwritePermissions(message.mentions.members.first().id, {
+                SEND_MESSAGES : false,
+                CONNECT : false
+            })
+        })
+        json[message.guild.id + message.mentions.members.first().id] = {muted : true};
+        fs.writeFile("json.json", JSON.stringify(json), err => {
+            if (err) console.error(err);
+        });
+        message.channel.send(`** <@${message.mentions.members.first().id}> Muted in the server!🤐**`);
+        break;
+        case "b-unmute" : 
+        if (!message.channel.type =="text") return;
+        if (!message.member.hasPermission("MANAGE_CHANNELS")) return;
+        if (!message.mentions.members.first()) return;
+        message.guild.channels.forEach(c => {
+            c.overwritePermissions(message.mentions.members.first().id, {
+                SEND_MESSAGES : null,
+                CONNECT : null
+            })
+        })
+        json[message.guild.id + message.mentions.members.first().id] = {muted : false};
+        fs.writeFile("json.json", JSON.stringify(json), err => {
+            if (err) console.error(err);
+        });
+        message.channel.send(`** <@${message.mentions.members.first().id}> Unmuted!😀**`);
+    }
+})
 
+.on("guildMemberAdd", (member) => {
+    if(json[member.guild.id + member.user.id]) {
+        if (json[member.guild.id + member.user.id].muted == true) {
+            member.guild.channels.forEach(c => {
+                c.overwritePermissions(member.user.id, {
+                    SEND_MESSAGES : false,
+                  CONNECT : false
+                })
+            })
+        }
+    }
+})
 
 
 client.login(process.env.BOT_TOKEN);
